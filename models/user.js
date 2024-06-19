@@ -49,9 +49,28 @@ const passwordRegexp =
     password: Joi.string().pattern(passwordRegexp).min(6).required(),
   });
 
+  const changePasswordSchema = Joi.object({
+    oldPassword: Joi.string()
+      .pattern(passwordRegexp)
+      .min(6)
+      .required()
+      .messages({
+        'string.pattern.base':
+          'Old password must contain at least one digit, one uppercase letter, one lowercase letter, one special character, and be at least 6 characters long',
+      }),
+    newPassword: Joi.string()
+      .pattern(passwordRegexp)
+      .min(6)
+      .required()
+      .messages({
+        'string.pattern.base':
+          'New password must contain at least one digit, one uppercase letter, one lowercase letter, one special character, and be at least 6 characters long',
+      }),
+  });
+
   const User = model("user", userSchema);
 
-  const schemas = { loginSchema, registerSchema };
+  const schemas = { loginSchema, registerSchema, changePasswordSchema };
 
 
 module.exports = {

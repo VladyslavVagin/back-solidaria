@@ -52,10 +52,31 @@ const login = async (req, res) => {
     await User.findByIdAndUpdate(_id, { token: "" });
     res.json({ message: "Logout success" });
   };
+
+  const changePassword = async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    const { _id } = req.user;
+  
+    const user = await User.findById(_id);
+    if (!user) {
+      throw HttpError(404, "User not found");
+    }
+  
+    const passwordCompare = await bcrypt.compare(oldPassword, user.password);
+    if (!passwordCompare) {
+      throw HttpError(401, "Old password is wrong");
+    }
+  
+    const hashPassword = await bcrypt.hash(newPassword, 10);
+    await User.findByIdAndUpdate(_id, { password: hashPassword });
+  
+    res.json({ message: "Password changed successfully" });
+  };
   
   module.exports = {
     login: ctrlWrapper(login),
     register: ctrlWrapper(register),
     getUserInfo: ctrlWrapper(getUserInfo),
-    logout: ctrlWrapper(logout)
+    logout: ctrlWrapper(logout),
+    changePassword: ctrlWrapper(changePassword),
   };
